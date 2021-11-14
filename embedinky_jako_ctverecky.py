@@ -60,7 +60,7 @@ with open(TXTFILE) as intext:
     logging.info(f'Načetl jsem {len(text)} řádek ze souboru {TXTFILE}')
 
 # !!!!
-# text = text[:4]
+text = text[:10]
 
 rows = len(text)
 cols = max([len(line) for line in text])
