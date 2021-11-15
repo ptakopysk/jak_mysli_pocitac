@@ -26,12 +26,12 @@ ap.add_argument('--TXTFILE', help='read text from this file', default="kava.txt"
 ap.add_argument('--N', help='side of square (so a square fits N^2 dimensions)', default=17)
 ap.add_argument('--SORT', help='show dimensions sorted', default=False)
 ap.add_argument('--DRAWLINES', help='represent by lines', default=False)
+ap.add_argument('--NORMDIMS', help='normalize each dimension separately', default=True)
+ap.add_argument('--EXP_FOR_OPACITY', type=float, help='exponentiate dimensions to make them more visible', default=0.75)
 
 args = ap.parse_args()
 
 embeddings = dict()
-
-embeddings_dim = 0
 
 logging.info(f'Načítám embedinky ze souboru {args.FILE}')
 with gzip.open(args.FILE, 'rt') as infile:
@@ -39,14 +39,28 @@ with gzip.open(args.FILE, 'rt') as infile:
     header = infile.readline().split()
     embeddings_dim = int(header[1])
     logging.info(f'Soubor obsahuje embedinky dimenze {header[1]} pro {header[0]} slov')
+    # absolute max in each dimension
+    embeddings_dim_sum = [0 for _ in range(embeddings_dim)]
     for line in infile:
         fields = line.split()
         word = fields[0]
         emb = [float(x) for x in fields[1:]]
         embeddings[word] = emb
+        if args.NORMDIMS:
+            for idx, dim in enumerate(emb):
+                embeddings_dim_sum[idx] += dim**2
         if len(embeddings) >= args.LIMIT:
             break
 logging.info(f'Načetl jsem {len(embeddings)} embedinků ze souboru {args.FILE}')
+
+if args.NORMDIMS:
+    # předpokládám že zhruba jsou dimenze centrované, tj. střední hodnota kolem 0
+    # takže rozptyl počítám jako průměrný čtverec (bez centrování)
+    stdevs = [(dim_sum/args.LIMIT)**0.5 for dim_sum in embeddings_dim_sum]
+    vypis = ' '.join([str(x) for x in stdevs])
+    logging.info(f'Střední hodnoty dimenzí: {vypis}')
+
+sys.exit()
 
 EMPTY_EMB = [0 for _ in range(embeddings_dim)]
 
@@ -104,22 +118,39 @@ def absmax1(number):
     a = abs(number)
     return a if a < 1 else 1
 
+def exp_sym(number, exponent):
+    if number > 0:
+        return number**exponent
+    else:
+        return -( (-number)**exponent )
+
 def draw_word(word, emb, ax):    
+    # normalize
+    new_emb = list()
+    if args.NORMDIMS:
+        for dim, absmax in zip(emb, embeddings_dim_abs_max):
+            new_emb.append(dim/absmax)
+    emb = new_emb
+    
     # text label of x axis
     ax.set_xlabel(word)
     if args.DRAWLINES:
         for dim, (xs, ys) in zip (emb, drawlines):
             color = 'b' if dim < 0 else 'r'
-            ax.plot(xs, ys, color, alpha=absmax1(dim))
+            ax.plot(xs, ys, color, alpha=absmax1(dim)**args.EXP_FOR_OPACITY)
     else:
-        # push embeddings into a square matrix
+        # scale
+        emb = [exp_sym(dim, args.EXP_FOR_OPACITY) for dim in emb]
+        # clip
         emb = emb[:args.N**2]
+        # sort
         if args.SORT:
             emb = sorted(emb)
+        # push embeddings into a square matrix
         data = np.reshape(emb, (args.N, args.N))
         # from blue to red
-        # ax.imshow(data, cmap='seismic', vmin=-1, vmax=1)
-        ax.imshow(data, cmap='seismic', vmin=-0.5, vmax=0.5)
+        ax.imshow(data, cmap='seismic', vmin=-1, vmax=1)
+        # ax.imshow(data, cmap='seismic', vmin=-0.5, vmax=0.5)
 
 logging.info(f'Načítám text ze souboru {args.TXTFILE}')
 with open(args.TXTFILE) as intext:
