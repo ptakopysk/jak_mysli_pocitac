@@ -24,10 +24,11 @@ ap.add_argument('--LIMIT', type=int, help='read this many embeddings', default=1
 ap.add_argument('--MAXLINES', type=int, help='read this many text lines', default=10)
 ap.add_argument('--TXTFILE', help='read text from this file', default="kava.txt")
 ap.add_argument('--N', type=int,help='side of square (so a square fits N^2 dimensions)', default=17)
-ap.add_argument('--SORT', type=bool, help='show dimensions sorted', default=False)
-ap.add_argument('--DRAWLINES', type=bool, help='represent by lines', default=False)
+ap.add_argument('--SORT', help='show dimensions sorted', default=False, action='store_true')
+ap.add_argument('--DRAWLINES', help='represent by lines', default=False, action='store_true')
 ap.add_argument('--EXP_FOR_OPACITY', type=float, help='exponentiate dimensions to make them more visible', default=1.0)
 ap.add_argument('--BESTLINES', type=int, help='only draw this many highest scoring lines', default=0)
+ap.add_argument('--BESTLINES_THRESHOLD', type=float, help='draw only lines with score above threshold', default=0.1)
 
 args = ap.parse_args()
 
@@ -50,7 +51,8 @@ logging.info(f'Načetl jsem {len(embeddings)} embedinků ze souboru {args.FILE}'
 
 EMPTY_EMB = [0 for _ in range(embeddings_dim)]
 
-NUM_OF_DRAWLINES = 26
+# NUM_OF_DRAWLINES = 26
+NUM_OF_DRAWLINES = 18
 
 import math
 if args.DRAWLINES:
@@ -65,22 +67,22 @@ if args.DRAWLINES:
             y = -2*row
             # svislý čáry
             drawlines.append( ([x, x], [y, y-2]) )
-            drawlines.append( ([x+0.25, x+0.25], [y, y-2]) )
+            #drawlines.append( ([x+0.25, x+0.25], [y, y-2]) )
             drawlines.append( ([x+0.50, x+0.50], [y, y-2]) )
-            drawlines.append( ([x+0.75, x+0.75], [y, y-2]) )
+            #drawlines.append( ([x+0.75, x+0.75], [y, y-2]) )
             drawlines.append( ([x+1, x+1], [y, y-2]) )
-            drawlines.append( ([x+1.25, x+1.25], [y, y-2]) )
+            #drawlines.append( ([x+1.25, x+1.25], [y, y-2]) )
             drawlines.append( ([x+1.50, x+1.50], [y, y-2]) )
-            drawlines.append( ([x+1.75, x+1.75], [y, y-2]) )
+            #drawlines.append( ([x+1.75, x+1.75], [y, y-2]) )
             # vodorovný čáry
             drawlines.append( ([x, x+2], [y, y]) )
-            drawlines.append( ([x, x+2], [y-0.25, y-0.25]) )
+            #drawlines.append( ([x, x+2], [y-0.25, y-0.25]) )
             drawlines.append( ([x, x+2], [y-0.50, y-0.50]) )
-            drawlines.append( ([x, x+2], [y-0.75, y-0.75]) )
+            #drawlines.append( ([x, x+2], [y-0.75, y-0.75]) )
             drawlines.append( ([x, x+2], [y-1, y-1]) )
-            drawlines.append( ([x, x+2], [y-1.25, y-1.25]) )
+            #drawlines.append( ([x, x+2], [y-1.25, y-1.25]) )
             drawlines.append( ([x, x+2], [y-1.50, y-1.50]) )
-            drawlines.append( ([x, x+2], [y-1.75, y-1.75]) )
+            #drawlines.append( ([x, x+2], [y-1.75, y-1.75]) )
             # čáry křížem
             drawlines.append( ([x, x+2], [y, y-2]) )
             drawlines.append( ([x, x+2], [y-2, y]) )
@@ -115,7 +117,31 @@ def draw_word(word, emb, ax):
     ax.set_xlabel(word)
     if args.DRAWLINES:
         if args.BESTLINES:
-            pass
+            # show frame
+            ax.set_frame_on(True)
+            ax.spines['top'].set_alpha(0)
+            ax.spines['right'].set_alpha(0)
+            ax.spines['bottom'].set_alpha(0.2)
+            #ax.spines['left'].set_color('black')
+            ax.spines['left'].set_alpha(0.2)
+            #ax.set_xlim(-0.5, drawlines_cols*2+0.5)
+            #ax.set_ylim(-drawlines_rows*2-0.5, 0.5)
+            ax.set_xlim(-0.1, drawlines_cols*2 + 0.1)
+            ax.set_ylim(-drawlines_rows*2 - 0.1, 0.1)
+            #plt.xticks(range(drawlines_cols*2+1), [])
+            #plt.yticks(range(-drawlines_rows*2-1, 1), [])
+            # show points
+            for x in range(0, drawlines_cols*2+1, 2):
+                for y in range(0, drawlines_rows*2+1, 2):
+                    ax.plot(x, -y, 'k,')
+            # sort by abs value
+            pairs = enumerate(emb)
+            pairs_sorted = sorted(pairs, key=lambda pair: -abs(pair[1]))
+            for idx, dim in pairs_sorted[:args.BESTLINES]:
+                if abs(dim) > args.BESTLINES_THRESHOLD:
+                    xs, ys = drawlines[idx]
+                    color = 'b' if dim < 0 else 'r'
+                    ax.plot(xs, ys, color, alpha=absmax1(dim)**args.EXP_FOR_OPACITY)
         else:
             for dim, (xs, ys) in zip (emb, drawlines):
                 color = 'b' if dim < 0 else 'r'
@@ -131,8 +157,8 @@ def draw_word(word, emb, ax):
         # push embeddings into a square matrix
         data = np.reshape(emb, (args.N, args.N))
         # from blue to red
-        ax.imshow(data, cmap='seismic', vmin=-1, vmax=1)
-        # ax.imshow(data, cmap='seismic', vmin=-0.5, vmax=0.5)
+        # ax.imshow(data, cmap='seismic', vmin=-1, vmax=1)
+        ax.imshow(data, cmap='seismic', vmin=-0.5, vmax=0.5)
 
 logging.info(f'Načítám text ze souboru {args.TXTFILE}')
 with open(args.TXTFILE) as intext:
