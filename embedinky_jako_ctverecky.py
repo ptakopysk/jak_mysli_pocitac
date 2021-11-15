@@ -22,8 +22,9 @@ ap = argparse.ArgumentParser()
 ap.add_argument('--FILE', help='embeddings file', default='cc.cs.300.vec.gz')
 ap.add_argument('--LIMIT', help='read this many embeddings', default=100000)
 ap.add_argument('--MAXLINES', help='read this many text lines', default=10)
-ap.add_argument('--TXTFILE', help='read text from this file', default="olasce.txt")
+ap.add_argument('--TXTFILE', help='read text from this file', default="kava.txt")
 ap.add_argument('--N', help='side of square (so a square fits N^2 dimensions)', default=17)
+ap.add_argument('--SORT', help='show dimensions sorted', default=False)
 
 args = ap.parse_args()
 
@@ -53,7 +54,10 @@ def absavg(list):
 
 def draw_word(word, emb, ax):    
     # push embeddings into a square matrix
-    data = np.reshape(emb[:args.N**2], (args.N, args.N))
+    emb = emb[:args.N**2]
+    if args.SORT:
+        emb = sorted(emb)
+    data = np.reshape(emb, (args.N, args.N))
     # text label of x axis
     ax.set_xlabel(word)
     # from blue to red
