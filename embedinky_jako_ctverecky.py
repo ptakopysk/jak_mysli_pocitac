@@ -50,10 +50,12 @@ logging.info(f'Načetl jsem {len(embeddings)} embedinků ze souboru {args.FILE}'
 
 EMPTY_EMB = [0 for _ in range(embeddings_dim)]
 
+NUM_OF_DRAWLINES = 26
+
 import math
 if args.DRAWLINES:
-    drawlines_rows = int((embeddings_dim/6)**0.5)
-    drawlines_cols = int(math.ceil(embeddings_dim/6/drawlines_rows))
+    drawlines_cols = int(math.ceil((embeddings_dim/NUM_OF_DRAWLINES)**0.5))
+    drawlines_rows = int(math.ceil(embeddings_dim/NUM_OF_DRAWLINES/drawlines_cols))
     logging.info(f'Budu kreslit čárovou reprezentaci o {drawlines_rows} řádcích a {drawlines_cols} sloupcích')
 
     drawlines = list()
@@ -63,13 +65,34 @@ if args.DRAWLINES:
             y = -2*row
             # svislý čáry
             drawlines.append( ([x, x], [y, y-2]) )
+            drawlines.append( ([x+0.25, x+0.25], [y, y-2]) )
+            drawlines.append( ([x+0.50, x+0.50], [y, y-2]) )
+            drawlines.append( ([x+0.75, x+0.75], [y, y-2]) )
             drawlines.append( ([x+1, x+1], [y, y-2]) )
+            drawlines.append( ([x+1.25, x+1.25], [y, y-2]) )
+            drawlines.append( ([x+1.50, x+1.50], [y, y-2]) )
+            drawlines.append( ([x+1.75, x+1.75], [y, y-2]) )
             # vodorovný čáry
             drawlines.append( ([x, x+2], [y, y]) )
+            drawlines.append( ([x, x+2], [y-0.25, y-0.25]) )
+            drawlines.append( ([x, x+2], [y-0.50, y-0.50]) )
+            drawlines.append( ([x, x+2], [y-0.75, y-0.75]) )
             drawlines.append( ([x, x+2], [y-1, y-1]) )
+            drawlines.append( ([x, x+2], [y-1.25, y-1.25]) )
+            drawlines.append( ([x, x+2], [y-1.50, y-1.50]) )
+            drawlines.append( ([x, x+2], [y-1.75, y-1.75]) )
             # čáry křížem
             drawlines.append( ([x, x+2], [y, y-2]) )
             drawlines.append( ([x, x+2], [y-2, y]) )
+            # čáry napůl křížem
+            drawlines.append( ([x, x+2], [y, y-1]) )
+            drawlines.append( ([x, x+2], [y-1, y-2]) )
+            drawlines.append( ([x, x+2], [y-2, y-1]) )
+            drawlines.append( ([x, x+2], [y-1, y]) )
+            drawlines.append( ([x, x+1], [y, y-2]) )
+            drawlines.append( ([x+1, x+2], [y, y-2]) )
+            drawlines.append( ([x, x+1], [y-2, y]) )
+            drawlines.append( ([x+1, x+2], [y-2, y]) )
 
 def avg(list):
     return sum(list)/len(list)
@@ -113,8 +136,9 @@ cols = max([len(line) for line in text])
 
 logging.info(f'Vytvářím {rows} řádek a {cols} sloupců')
 
-fig, axs = plt.subplots(rows, cols)
-    
+px = 1/plt.rcParams['figure.dpi']
+fig, axs = plt.subplots(rows, cols, figsize=(1920*px, 1080*px))
+
 # set style for all axes
 for row in axs:
     for ax in row:
@@ -128,6 +152,7 @@ logging.info(f'Vykresluji slova')
 
 # draw words
 for line, row in zip(text, axs):
+    logging.info(f'Vykresluji řádek: ' + ' '.join(line))
     for word, ax in zip(line, row):
         cleaned_word = re.sub(r'[^[:alpha:]]', '', word)
         if cleaned_word in embeddings:
@@ -140,5 +165,10 @@ for line, row in zip(text, axs):
 
 logging.info(f'Vykresluji obrázek')
 
+outname = re.sub(r'txt$', 'pdf', args.TXTFILE)
+logging.info(f'Ukládám obrázek do {outname}')
+plt.savefig(outname)
+
+logging.info(f'Zobrazuji obrázek')
 plt.show()
 
