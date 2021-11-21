@@ -18,6 +18,18 @@ trochu na jinym místě?
 connected)
 
 ...asi víc barev
+https://matplotlib.org/stable/_images/sphx_glr_named_colors_001.png
+https://matplotlib.org/stable/_images/sphx_glr_named_colors_002.png
+https://matplotlib.org/stable/_images/sphx_glr_named_colors_003.png
+https://matplotlib.org/stable/gallery/color/named_colors.html
+
+xkcd:*
+https://i1.wp.com/imgs.xkcd.com/blag/assorted_colors.png
+
+Asi zvolím tohle:
+one of {'tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan'} which are the Tableau Colors from the 'tab10' categorical palette (which is the default color cycle);
+
+
 
 ...asi aspoň rovně a šikmo, tam to přenásobim sqrt(2)/2 a mělo by to bejt
 stejnej scale, akorát direction nebude 0/1 ale -1/1
