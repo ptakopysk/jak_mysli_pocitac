@@ -36,6 +36,7 @@ ap.add_argument('--colors', type=int, help='how many colors', default=6)
 ap.add_argument('--show', help='show plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--store', help='store plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--format', help='format of the stored file (pdf, svg, eps, png...)', default="svg")
+ap.add_argument('--decentered', help='move colors from start a bit to reduce overlap', default=True, action=argparse.BooleanOptionalAction)
 
 args = ap.parse_args()
 
@@ -204,7 +205,10 @@ def draw_word(word, emb, ax):
                 if newcolor != color:
                     color = newcolor
                     direction = 0
-                    x0, y0 = STARTS[color]
+                    if args.decentered:
+                        x0, y0 = STARTS[color]
+                    else:
+                        x0, y0 = 0, 0
         # limit (ensures centering)
         absmax += 0.1
         ax.set_xlim(-absmax, absmax)

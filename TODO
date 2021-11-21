@@ -13,6 +13,17 @@ víc barev, pro každou barvu začít znova ze začátku (multistart)
 TODO: stejně se to furt dost překrejvá, asi bych potřeboval každou barvu začít
 trochu na jinym místě?
 
+...asi parametrizovat to vystředění, 0.5 se zdá moc
+(taky můžu přidat vždycky čáru ze středu do startu tý barvy ať to vypadá
+connected)
+
+...asi víc barev
+
+...asi aspoň rovně a šikmo, tam to přenásobim sqrt(2)/2 a mělo by to bejt
+stejnej scale, akorát direction nebude 0/1 ale -1/1
+
+
+
 
 jiná varianta: "sluníčko"
 - každá dimenze má svůj směr
