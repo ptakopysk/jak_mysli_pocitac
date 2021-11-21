@@ -32,6 +32,7 @@ ap.add_argument('--BESTLINES_THRESHOLD', type=float, help='draw only lines with 
 ap.add_argument('--LEFTRIGHT',
     help='represent by lines going -left and +right; for + it goes up/right, for - down/left',
     default=False, action='store_true')
+ap.add_argument('--colors', type=int, help='how many colors', default=6)
 ap.add_argument('--show', help='show plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--store', help='store plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--format', help='format of the stored file (pdf, svg, eps, png...)', default="svg")
@@ -118,6 +119,8 @@ def exp_sym(number, exponent):
     else:
         return -( (-number)**exponent )
 
+COLORS = ('b', 'g', 'r', 'c', 'm', 'y')
+
 def draw_word(word, emb, ax):    
     # text label of x axis
     ax.set_xlabel(word)
@@ -153,9 +156,8 @@ def draw_word(word, emb, ax):
                 color = 'b' if dim < 0 else 'r'
                 ax.plot(xs, ys, color, alpha=absmax1(dim)**args.EXP_FOR_OPACITY)
     elif args.LEFTRIGHT:
-        ax.axis('scaled')
-        x0, y0 = 0, 0
         # frame
+        ax.axis('scaled')
         ax.plot(0, 0, 'k+', alpha=0.2)
         for xs, ys in (
                 # axes
@@ -169,20 +171,29 @@ def draw_word(word, emb, ax):
             ax.plot(xs, ys, 'k:', alpha=0.2, lw=1)
         # 1: horizontal; 0: vertical
         direction = 0
+        x0, y0 = 0, 0
         absmax = 0
-        for dim in emb:
+        color = 0
+        for idx, dim in enumerate(emb):
             # move by dim in the direction
             x1 = x0 + dim*direction
             y1 = y0 + dim*(1-direction)
             # draw line
-            # color = 'k'
-            # alpha = 1
-            #logging.info(f'ax.plot(({x0}, {x1}), ({y0}, {y1})')
-            ax.plot((x0, x1), (y0, y1), lw=1)
+            if args.colors:
+                ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5, color=COLORS[color])
+            else:
+                ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5)
             # prepare for next step
+            absmax = max(absmax, abs(x1), abs(y1))
             direction = 1 - direction
             x0, y0 = x1, y1
-            absmax = max(absmax, abs(x0), abs(y0))
+            # may move on to a new color
+            if args.colors:
+                newcolor = int(idx // (len(emb)/args.colors))
+                if newcolor != color:
+                    color = newcolor
+                    direction = 0
+                    x0, y0 = 0, 0
         # limit (ensures centering)
         absmax += 0.1
         ax.set_xlim(-absmax, absmax)
