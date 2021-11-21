@@ -29,7 +29,9 @@ ap.add_argument('--DRAWLINES', help='represent by lines', default=False, action=
 ap.add_argument('--EXP_FOR_OPACITY', type=float, help='exponentiate dimensions to make them more visible', default=1.0)
 ap.add_argument('--BESTLINES', type=int, help='only draw this many highest scoring lines', default=0)
 ap.add_argument('--BESTLINES_THRESHOLD', type=float, help='draw only lines with score above threshold', default=0.1)
-ap.add_argument('--LEFTRIGHT', help='represent by lines going -left and +right', default=False, action='store_true')
+ap.add_argument('--LEFTRIGHT',
+    help='represent by lines going -left and +right; for + it goes up/right, for - down/left',
+    default=False, action='store_true')
 ap.add_argument('--show', help='show plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--store', help='store plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--format', help='format of the stored file (pdf, svg, eps, png...)', default="svg")

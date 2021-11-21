@@ -3,9 +3,26 @@ obrázky:
 
 ještě místo opacity by šlo měnit délku, co je slabý dělat kratší...
 
+leftright: vskztečnosti updown, nechem skutečně leftright?
+
+víc barev, pro každou barvu začít znova ze začátku (multistart)
+
++ pro každej restart jiný sešikmení
 
 
 
+jiná varianta: "sluníčko"
+- každá dimenze má svůj směr
+- abs velikost je délka
+- znamínko je buď barva
+- anebo barvy se střídaj automaticky a znamínko je styl --/:
+
+
+a taky tohle provést jen s best lines
+
+
+až do toho zatáhnu Tomáše tak zkusit tohle dělat na transformovanejch
+dimenzích, a vybírat třebas jen ty nejvýznamnější
 
 
 zaokrouhlovat procenta
@@ -13,5 +30,6 @@ zaokrouhlovat procenta
 je trochu nude že je to skoro vždycky morfologický
 
 výhledově web rozhraní
+
 
 
