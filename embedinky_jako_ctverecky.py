@@ -120,6 +120,17 @@ def exp_sym(number, exponent):
         return -( (-number)**exponent )
 
 COLORS = ('b', 'g', 'r', 'c', 'm', 'y')
+STARTS = (
+        (0, 0),
+        (0.25, 0.25),
+        (-0.25, 0.25),
+        (0.25, -0.25),
+        (-0.25, -0.25),
+        (0, 0.25),
+        (0, -0.25),
+        (0.25, 0),
+        (-0.25, 0),
+        )
 
 def draw_word(word, emb, ax):    
     # text label of x axis
@@ -171,9 +182,9 @@ def draw_word(word, emb, ax):
             ax.plot(xs, ys, 'k:', alpha=0.2, lw=1)
         # 1: horizontal; 0: vertical
         direction = 0
-        x0, y0 = 0, 0
-        absmax = 0
         color = 0
+        x0, y0 = STARTS[color]
+        absmax = 0
         for idx, dim in enumerate(emb):
             # move by dim in the direction
             x1 = x0 + dim*direction
@@ -193,7 +204,7 @@ def draw_word(word, emb, ax):
                 if newcolor != color:
                     color = newcolor
                     direction = 0
-                    x0, y0 = 0, 0
+                    x0, y0 = STARTS[color]
         # limit (ensures centering)
         absmax += 0.1
         ax.set_xlim(-absmax, absmax)
