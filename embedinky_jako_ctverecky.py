@@ -29,6 +29,7 @@ ap.add_argument('--DRAWLINES', help='represent by lines', default=False, action=
 ap.add_argument('--EXP_FOR_OPACITY', type=float, help='exponentiate dimensions to make them more visible', default=1.0)
 ap.add_argument('--BESTLINES', type=int, help='only draw this many highest scoring lines', default=0)
 ap.add_argument('--BESTLINES_THRESHOLD', type=float, help='draw only lines with score above threshold', default=0.1)
+ap.add_argument('--LEFTRIGHT', help='represent by lines going -left and +right', default=False, action='store_true')
 
 args = ap.parse_args()
 
@@ -146,6 +147,22 @@ def draw_word(word, emb, ax):
             for dim, (xs, ys) in zip (emb, drawlines):
                 color = 'b' if dim < 0 else 'r'
                 ax.plot(xs, ys, color, alpha=absmax1(dim)**args.EXP_FOR_OPACITY)
+    elif args.LEFTRIGHT:
+        x0, y0 = 0, 0
+        # 1: horizontal; 0: vertical
+        direction = 0
+        for dim in emb:
+            # move by dim in the direction
+            x1 = x0 + dim*direction
+            y1 = y0 + dim*(1-direction)
+            # draw line
+            # color = 'k'
+            # alpha = 1
+            #logging.info(f'ax.plot(({x0}, {x1}), ({y0}, {y1})')
+            ax.plot((x0, x1), (y0, y1))
+            # prepare for next step
+            direction = 1 - direction
+            x0, y0 = x1, y1
     else:
         # scale
         emb = [exp_sym(dim, args.EXP_FOR_OPACITY) for dim in emb]
