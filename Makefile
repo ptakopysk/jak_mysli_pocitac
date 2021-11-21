@@ -9,3 +9,6 @@ znaky:
 leftright:
 	./embedinky_jako_ctverecky.py --LEFTRIGHT --TXTFILE=$(TXTFILE)
 
+leftright_all:
+	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --TXTFILE=$$f; done
+
