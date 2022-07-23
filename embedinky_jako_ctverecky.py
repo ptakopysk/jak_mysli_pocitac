@@ -32,6 +32,7 @@ ap.add_argument('--BESTLINES_THRESHOLD', type=float, help='draw only lines with 
 ap.add_argument('--LEFTRIGHT',
     help='represent by lines going -left and +right; for + it goes up/right, for - down/left',
     default=False, action='store_true')
+ap.add_argument('--opacitybased', help='dimension translates to opacity', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--colors', type=int, help='how many colors; for decentralization: how many starts', default=6)
 ap.add_argument('--transcolor', help='continuous color transition', default=False, action=argparse.BooleanOptionalAction)
 ap.add_argument('--show', help='show plot', default=True, action=argparse.BooleanOptionalAction)
@@ -217,14 +218,20 @@ def draw_word(word, emb, ax):
             # move by dim in the direction
             x1 = x0 + dim*direction
             y1 = y0 + dim*(1-direction)
+            # alpha
+            if args.opacitybased:
+                alpha = absmax1(dim)**args.EXP_FOR_OPACITY
+            else:
+                alpha = 0.5
             # draw line
             if args.transcolor:
-                ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5,
+                ax.plot((x0, x1), (y0, y1), lw=1, alpha=alpha,
                         color=transcolor(idx, len(emb)))
             elif args.colors:
-                ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5, color=COLORS[color])
+                ax.plot((x0, x1), (y0, y1), lw=1, alpha=alpha,
+                        color=COLORS[color])
             else:
-                ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5)
+                ax.plot((x0, x1), (y0, y1), lw=1, alpha=alpha)
             # prepare for next step
             absmax = max(absmax, abs(x1), abs(y1))
             direction = 1 - direction
