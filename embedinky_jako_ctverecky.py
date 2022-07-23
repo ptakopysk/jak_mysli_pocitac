@@ -32,7 +32,8 @@ ap.add_argument('--BESTLINES_THRESHOLD', type=float, help='draw only lines with 
 ap.add_argument('--LEFTRIGHT',
     help='represent by lines going -left and +right; for + it goes up/right, for - down/left',
     default=False, action='store_true')
-ap.add_argument('--colors', type=int, help='how many colors', default=6)
+ap.add_argument('--colors', type=int, help='how many colors; for decentralization: how many starts', default=6)
+ap.add_argument('--transcolor', help='continuous color transition', default=False, action=argparse.BooleanOptionalAction)
 ap.add_argument('--show', help='show plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--store', help='store plot', default=True, action=argparse.BooleanOptionalAction)
 ap.add_argument('--format', help='format of the stored file (pdf, svg, eps, png...)', default="svg")
@@ -121,21 +122,47 @@ def exp_sym(number, exponent):
         return -( (-number)**exponent )
 
 COLORS = ('b', 'g', 'r', 'c', 'm', 'y')
+D = 0.25
 STARTS = (
-        (0, 0),
-        (0.25, 0.25),
-        (-0.25, 0.25),
-        (0.25, -0.25),
-        (-0.25, -0.25),
-        (0, 0.25),
-        (0, -0.25),
-        (0.25, 0),
-        (-0.25, 0),
+        ( 0, 0),
+        ( D,  D),
+        (-D,  D),
+        ( D, -D),
+        (-D, -D),
+        ( 0,  D),
+        ( 0, -D),
+        ( D,  0),
+        (-D,  0),
+        (D/2, D/2),
+        (-D/2, D/2),
+        (D/2, -D/2),
+        (-D/2, -D/2),
         )
+
+def transcolor(idx, dimensions):
+    """
+    idx between 0 and dimensions-1;
+    does one cycle over red,
+    faster cycles over green,
+    and very fast cycles over blue
+    """
+    # too high numbers not visible anyway
+    MAX = 0.8
+    # cubic root is the cycling period
+    cycler = int(dimensions ** (1/3)) + 1
+    # one continuous cycle from 0 to MAX
+    r = idx / dimensions * MAX
+    # cycler cycles
+    g = (idx % cycler**2) / cycler**2 * MAX
+    # cycler**2 cycles
+    b = (idx % cycler) / cycler * MAX
+    
+    logging.debug(f'Barva {(r, g, b)}')
+    return (r, g, b)
 
 def draw_word(word, emb, ax):    
     # text label of x axis
-    ax.set_xlabel(word)
+    ax.set_xlabel(word, labelpad=-10)
     if args.DRAWLINES:
         if args.BESTLINES:
             # show frame
@@ -191,7 +218,10 @@ def draw_word(word, emb, ax):
             x1 = x0 + dim*direction
             y1 = y0 + dim*(1-direction)
             # draw line
-            if args.colors:
+            if args.transcolor:
+                ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5,
+                        color=transcolor(idx, len(emb)))
+            elif args.colors:
                 ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5, color=COLORS[color])
             else:
                 ax.plot((x0, x1), (y0, y1), lw=1, alpha=0.5)

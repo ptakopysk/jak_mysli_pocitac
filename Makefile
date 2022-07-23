@@ -12,3 +12,6 @@ leftright:
 leftright_all:
 	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --TXTFILE=$$f; done
 
+leftright_all_transcolor:
+	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --colors 13 --transcolor --format svg --TXTFILE=$$f; done
+

@@ -59,3 +59,18 @@ výhledově web rozhraní
 
 
 
+
+
+generovat avatary?
+https://github.com/ibonn/python_avatars
+lidi uměj dobře rozpoznávat xichty
+ale potřeboval bych aby ty avatary měly hodně spojitejch fíčur -- barva,
+poloha, velikost, částečně tvar...
+
+
+případně githubovity avatary
+https://github.com/innix/github-avatar-generator
+
+
+
+udělat na tom PCA a koukat jen na několik ejdůležitějších dimenzí (třeba 20)
