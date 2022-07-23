@@ -15,3 +15,15 @@ leftright_all:
 leftright_all_transcolor:
 	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --colors 13 --transcolor --EXP_FOR_OPACITY 0.5 --format svg --TXTFILE=$$f; done
 
+leftright_pca_transcolor:
+	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --colors 13 --transcolor --EXP_FOR_OPACITY 0.5 --format svg --FILE cc.cs.pca.100.vec.gz --TXTFILE=$$f; done
+
+leftright_pca_transcolor_noopacity:
+	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --colors 13 --transcolor --no-opacitybased --format svg --FILE cc.cs.pca.100.vec.gz --TXTFILE=$$f; done
+
+leftright_pca_transcolor_noopacity_nodec:
+	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --colors 1 --transcolor --no-opacitybased --format svg --FILE cc.cs.pca.100.vec.gz --TXTFILE=$$f; done
+
+leftright_pca_transcolor_nodec:
+	for f in *.txt; do ./embedinky_jako_ctverecky.py --no-show --LEFTRIGHT --colors 1 --transcolor --EXP_FOR_OPACITY 0.5 --format svg --FILE cc.cs.pca.100.vec.gz --TXTFILE=$$f; done
+
